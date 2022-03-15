@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="CoderChain, BlockChain">
+    <meta name="keywords"
+          content="CoderChain, BlockChain">
+    <title>所有代码列表 - CoderChain</title>
+    <link rel="shortcut icon" href="../static/images/logo/coderchain-logo.png" type="image/x-icon">
+    <link rel="icon" href="../static/images/logo/coderchain-logo.png" type="image/x-icon">
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../static/css/style-no-override.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    <!--     <link rel="stylesheet" type="text/css" href="../static/css/slick/slick.css"/>
+        <link rel="stylesheet" type="text/css" href="../static/css/slick/slick-theme.css"/> -->
+    <link rel="stylesheet" href="../static/css/chain.css">
+    <link rel="stylesheet" href="../static/css/user.css">
+    <script>
+      console.log = function () {
+      }
+    </script>
+    <script src="../static/js/modernizr.js"></script>
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="../static/js/particles.min.js"></script>
+    <script src="../static/js/jquery-2.1.1.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://app.denglu1.com/js/JsonpEx.js"></script>
+    <script type="text/javascript" src="../static/js/vue.min.js"></script>
+    <script src="../static/js/pagination.js"></script>
+    <script type="text/javascript" src="../static/js/util.js"></script>
+    <script type="text/javascript" src="../static/js/api/project.js"></script>
+    <script>
+      window.onload = function () {
+
+        var urlParamObj = Util.parseUrlParams()
+        // 获取项目类型：我的项目或者全部项目
+        var type = urlParamObj.type
+
+        // 根据这个project参数来查找该文件名
+        initVM()
+
+        function initVM() {
+          var vueInstance = new Vue({
+            el: '#vm',
+            data: {
+              pageInstance: null,
+              projectList: [],
+              showProjectList: [],
+              user: Util.getUserAddr(),
+              type: '',
+              loading: true
+            },
+            created: function () {
+              this.fetchProjects()
+            },
+            filters: {
+              urlDecode: function (value) {
+                // return decodeURI(value)
+                return decodeURIComponent(value)
+              }
+            },
+            methods: {
+              fetchProjects: function () {
+                // 拉取数据
+                var that = this
+    
+                if (type === 'my') {
+                  that.type = 'my'
+                  // 获取我的项目
+                  projectApi.getProjectList().then(function (data) {
+                    console.log('resolve: ', data)
+                    that.projectList = data
+                    that.loading = false
+                  }).catch(function (err) {
+                    Util.showErrorPanel('网络繁忙，请重新再试')
+                  })
+                } else {
+                  projectApi.getAllProjectList().then(function (data) {
+                    console.log('resolve data: ', data)
+                    that.projectList = data
+                    that.loading = false
+                  }).catch(function (err) {
+                    Util.showErrorPanel('网络繁忙，请重新再试')
+                  })
+                }
+
+              },
+              deleteProject: function (name) {
+                // 删除项目
+                var that = this
+                if (!window.confirm('确认删除项目"' + decodeURI(name) + '"吗, 操作不可撤销？')) {
+                  return
+                }
+                projectApi.deleteProject(name).then(function (data) {
+                  Util.showInfoPanel('删除项目成功')
+                  that.fetchProjects()
+                }).catch(function (err) {
+                  Util.showErrorPanel('删除项目失败')
+                })
+              },
+              handleClickProject: function() {
+                // 这里记录下页数和位置
+                let page = this.pageInstance.currentPage
+                console.log('handleClickProject 当前页数：', page)
+                let scrollTop = $(window).scrollTop()
+                localStorage.setItem('pageNum', page)
+                localStorage.setItem('scrollTop', scrollTop)
+              }
+            },
+            watch: {
+              projectList(list) {
+                let that = this
+                if (that.type === 'my') {
+                  that.showProjectList = list
+                  return
+                }
+                this.pageInstance = new PaginationWithDOM({
+                  contents: list,
+                  perPageRecord: 20,
+                  pageBtnNum: 5
+                }, (data) => {
+                  that.showProjectList = data
+                })
+                
+                // 跳转到第几页
+                if (localStorage.getItem('pageNum')) {
+                  let p = parseInt(localStorage.getItem('pageNum'))
+                  console.log('跳转到第几页：', p)
+                  // 第几个item click
+                  this.pageInstance.goPage(p)
+                }
+                
+                if (localStorage.getItem('scrollTop')) {
+                  let scrollTop = parseInt(localStorage.getItem('scrollTop'))
+                  // $('body, html').animate({scrollTop: scrollTop}, 500)
+                  setTimeout(() => {
+                    window.scrollTo(0, scrollTop)
+                  })
+                }
+              }
+            }
+          })
+        }
+      }
+    </script>
+</head>
+
+<body class="home">
+
+<section class="header" id="vm" v-cloak>
+    <custom-nav></custom-nav>
+    
+    <div id="particles-js"></div>
+    
+    <div class="container box-container">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">所有项目列表</h3>
+                </div>
+                <div class="panel-body">
+                    <ul class="list-group">
+                        <li class="list-group-item" v-if="loading">
+                            正在加载中...
+                        </li>
+                        <template v-else>
+                            <li class="list-group-item" v-for="project in showProjectList"
+                                v-if="projectList.length > 0">
+                                <div>
+                                    <h3>
+                                        <a :href="'./project-detail.html?user=' + project.user +'&project=' + project.name" @click="handleClickProject">{{
+                                            project.name | urlDecode}}</a></h3>
+                                    <p>Created by: {{ project.user }}</p>
+                                    <div class="text-right" v-if="user == project.user">
+                                        <button class="btn btn-danger" @click="deleteProject(project.name)">删除项目
+                                        </button>
+                                    </div>
+                                
+                                </div>
+                            </li>
+                            <li class="list-group-item" v-if="projectList.length <= 0">
+                                暂无项目
+                            </li>
+                        </template>
+                    </ul>
+                    <div class="pagination-container" v-show="type !== 'my'">
+                        <ul class="pagination" id="mPageItem"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="address">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    ©Copyright - CoderChain. All Rights Reserved.
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script type="text/javascript" src="../static/js/slick.min.js"></script>
+<!-- <script type="text/javascript" src="../static/js/typewriting.min.js"></script> -->
+<script src="../static/js/main.js"></script>
+</body>
+</html>

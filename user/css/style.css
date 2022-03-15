@@ -1,0 +1,123 @@
+a {
+    outline: 0;
+}
+
+a:focus {
+    outline: 0;
+}
+
+button, html input[type="button"], input[type="reset"], input[type="submit"] {
+    -webkit-appearance: none;
+    cursor: pointer;
+}
+
+.download {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.download a {
+    /*color: #fff;*/
+    /*text-decoration: underline;*/
+}
+
+.content-wrapper {
+    width: 400px;
+    height: 500px;
+    color: #EEE;
+    position: absolute;
+    left: 50%;
+    top:50%;
+    margin-left: -200px;
+    margin-top: -250px;
+    display: flex;
+    align-items: center;
+}
+
+.login-by-denglu1 > p {
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+.login-by-denglu1 > p a {
+      display: inline-block;
+      text-decoration: none;
+  }
+
+.login-by-denglu1 p a > * {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.login-by-denglu1 img {
+    width: 22px;
+    height: 22px;
+}
+
+.logo-wrapper h1{
+    text-align: center;
+    margin: 0;
+}
+
+.page-text h2{
+    font-weight: normal;
+    color: #333;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: #333 1px solid !important;
+}
+
+.logo img {
+    height: 150px;
+}
+
+.logo_box {
+    padding: 10px 35px;
+    background-color: #F7F7F7;
+    border: 1px solid #ffffff;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px 0 rgba(97,97,97, 0.6);
+}
+
+
+.btn-group {
+    text-align: center;
+}
+
+.right {
+    text-align: center;
+    color: #888;
+}
+
+.success-wrapper {
+    text-align: center;
+    color: #333;
+}
+
+.msg-wrapper {
+    color: #f00;
+    margin: 0;
+    margin-left: 20px;
+    margin-bottom: 10px;
+    font-size: 16px;
+    height: 20px;
+}
+
+.input-wrapper {
+    /* display: none; */
+}
+
+.qrcode img {
+    margin: 0 auto;
+}
+
+.tip {
+    color: #333;
+    text-align: center;
+}
+
+.qrcode div {
+    /*width: 200px;*/
+    /*height: 200px;*/
+    margin: 0 auto;
+}

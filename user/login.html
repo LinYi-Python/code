@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>登录 - CoderChain</title>
+    <link rel="shortcut icon" href="../static/images/logo/coderchain-logo.png" type="image/x-icon">
+    <link rel="icon" href="../static/images/logo/coderchain-logo.png" type="image/x-icon">
+    <script>
+      console.log = function () {
+      }
+      if (/(coderchain\.denglu1\.cn)/g.test(document.location.origin)) {
+        window.location.replace(document.location.href.replace('coderchain.denglu1.cn', 'coderchain.cn'))
+      }
+      
+      // 已经登录则跳转
+      // if (localStorage.getItem('userAddr') && localStorage.getItem('username')) {
+      //        window.location.replace('../home/')
+      //      }
+      
+    </script>
+    <link rel="stylesheet" href="css/normalize.css"/>
+    <link rel="stylesheet" href="css/component.css"/>
+    <link rel="stylesheet" href="css/style.css">
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="container demo-1">
+    <div class="content">
+        <div id="large-header" class="large-header">
+            <canvas id="demo-canvas"></canvas>
+            <div class="content-wrapper">
+                <div class="logo_box">
+                    <div class="logo-wrapper">
+                        <h1 class="logo">
+                            <a href="../index.html">
+                                <img src="https://app.denglu1.com/img/CoderChainLogo500.png" alt="">
+                            </a>
+                        </h1>
+                    </div>
+                    <div class="page-text">
+                        <h2>登录</h2>
+                    </div>
+                    <p class="msg-wrapper" id="msg">
+                    </p>
+                    <div class="qrcode">
+                        <div id="DengLu1_QRCode"></div>
+                        <!--<img src="" alt="" id="test_qr">-->
+                    </div>
+                    <div class="input-wrapper">
+                        <div class="input_outer">
+                            <span class="u_user"></span>
+                            <input name="usernamel" id="username" class="text" type="text" placeholder="请输入账户">
+                        </div>
+                        <div class="input_outer">
+                            <span class="us_uer"></span>
+                            <input name="passwordl" class="text" id="password" type="password" placeholder="请输入密码">
+                        </div>
+                        
+                        <div class="mb2 btn-group">
+                            <input class="btn btn-primary" type="button" id="btnLogin" value="登录">
+                            <!--<a href="register.html" class="btn">我还没账号</a>-->
+                        </div>
+                    </div>
+                    <p class="tip">用登录易APP扫一扫登录</p>
+                    <div class="mb2 btn-group">
+                        <a href="register.html" class="btn">我还没账号</a>
+                    </div>
+                    <div class="download">
+                        <div class="login-by-denglu1">
+                            <!--<p>-->
+                            <!--<a href="javascript: void(0);" class="DengLu1Btn">-->
+                            <!--<img src="../static/images/denglu1-blue.png" id="btnQRCode" width="22" height="22">-->
+                            <!--<span>-->
+                            <!--登录易扫码登录-->
+                            <!--</span>-->
+                            <!--</a>-->
+                            <!--</p>-->
+                            <p>
+                                <a href="https://www.denglu1.cn/#section-download">
+                                    点击这里下载登录易
+                                </a>
+                            </p>
+                        
+                        </div>
+                    </div>
+                    <div class="right">
+                        ©Copyright - CoderChain. All Rights Reserved.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- /container -->
+<script src="js/TweenLite.min.js"></script>
+<script src="js/EasePack.min.js"></script>
+<script src="js/rAF.js"></script>
+<script src="js/demo-1.js"></script>
+<script src="https://app.denglu1.com/js/base.js"></script>
+<!-- <script type="text/javascript" src="https://app.denglu1.com/js/DengLu1.js?v=29"></script> -->
+<script src="js/DengLu1.js"></script>
+<!--<script src="https://open.denglu.net.cn/js/denglu1.js"></script>-->
+<script src="https://app.denglu1.com/js/JsonpEx.js"></script>
+<script src="js/login.js"></script>
+</body>
+
+<script type="text/javascript">
+
+  JsonpEx.domain = "coderchain.cn";
+
+  window.onload = function () {
+    buildLoginQRCode()
+
+    $("#btnLogin").click(function () {
+      loginObj.loginEvent();
+    })
+
+    // OPEN API 2
+
+
+//    var denglu = new DengluOpen('28f65a30a305348d21f10f57b45af927', 'https://coderchain.cn');
+//    denglu.getLoginQRBase64('test_qr', {
+//      sCookie: true
+//    });
+//    denglu.startListen(
+//      function (error) {
+//        console.log('error: ', error)
+//      },
+//      function (success) {
+//        console.log('success: ', success)
+//        // 清除cookie
+//        clearAllCookie()
+//
+//        document.cookie = success.sCookie.replace(/(\s|[\n\r])/g, '')
+//
+//        var msg = JSON.parse(success.sOriginMsg)
+//        localStorage.setItem('username', msg.oRet.sUserName)
+//        localStorage.setItem('userAddr',  msg.oRet.sUserAddr)
+//        /*
+//        {sUserName: "BBB", sCookie: " PHPSESSID=4rjfbq8hqmqjj7i3npncv1e182; path=/
+//↵", sOriginMsg: " {"retCode":"0", "retMsg":"success", "oRet":{"id":…0180930113710_3851da89edb056792d60abd5eda2d3bb" }", sSign: "c8uAoWX14IXQMS8XvBQvV1kuvrbz2a37HKx6zcuXQfAmYY0KdI…zTyrbUMBsEY8Mr+Wq9bhsuBHhGaa/n4wiayOGtYOWQWmbhg=="}
+//sCookie: " PHPSESSID=4rjfbq8hqmqjj7i3npncv1e182; path=/
+//↵"
+//sOriginMsg: " {"retCode":"0", "retMsg":"success", "oRet":{"id":"101","sUserName":"BBB","sUserAddr":"0x52dF3686526885385E117375892Ac168aC32e145"}, "sSerialCode":"QFQ_20180930113710_3851da89edb056792d60abd5eda2d3bb" }"
+//sSign: "c8uAoWX14IXQMS8XvBQvV1kuvrbz2a37HKx6zcuXQfAmYY0KdIAiB3GqlbRafggIO6ihcvwQZ3fKwF7YdCHTeDEQGTDQj8m64rdKoiE6ggb6Xj3QD5V9ftRYkbEktX4W3rYISwj5gIAtJDrzGm7QjneuwJXk424MRN+OIljiHKnL+NQZhIROiUmn8HxRlCFcnBuSB5uTwsUYglzEaNkuFeNX2sRvCZ5FGTdHrjjqlz616guIZs28qHpUzHoy3VJHuhiEj8Inbe6Y85RfIA9LTl3hU/syRRkLWqfFn0nzTyrbUMBsEY8Mr+Wq9bhsuBHhGaa/n4wiayOGtYOWQWmbhg=="
+//sUserName: "BBB"
+//        **/
+////        window.location.href = './success-login.html'
+//      })
+  }
+
+  //清除所有cookie函数
+  function clearAllCookie() {
+    var keys = document.cookie.match(/[^ =;]+(?=\=)/g);
+    if (keys) {
+      for (var i = keys.length; i--;)
+        document.cookie = keys[i] + '=0;expires=' + new Date(0).toUTCString()
+    }
+  }
+
+</script>
+
+</html>

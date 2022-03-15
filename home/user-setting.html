@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="CoderChain, BlockChain" />
+    <meta name="keywords" content="CoderChain, BlockChain" />
+    <title>个人设置 - CoderChain</title>
+    <link
+      rel="shortcut icon"
+      href="../static/images/logo/coderchain-logo.png"
+      type="image/x-icon"
+    />
+    <link
+      rel="icon"
+      href="../static/images/logo/coderchain-logo.png"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../static/css/global.css" />
+    <style>
+      .setting-item {
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+      }
+
+      .setting-item > span {
+        min-width: 150px;
+      }
+
+      .setting-item > div {
+        flex: 1;
+      }
+
+      .setting-item > div input, textarea {
+        width: 100%;
+        max-width: 300px;
+      }
+
+      .setting-item .radio-inline > span {
+        margin-left: 20px;
+      }
+
+      .setting-item .setting-avatar {
+        width: 100px;
+      }
+    </style>
+    <script>
+      //   console.log = function() {}
+    </script>
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <main id="vm" v-cloak>
+      <section class="view-container">
+        <div id="particles-js"></div>
+        <custom-nav></custom-nav>
+
+        <div class="container box-container">
+          <div class="col-md-12">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">个人设置</h3>
+              </div>
+              <div class="panel-body">
+                <div class="jumbotron">
+                  <ul class="setting">
+                    <li class="setting-item">
+                      <span>头像</span>
+                      <div>
+                        <img
+                          :src="'/dev/controller/exUserController.php?action=getImage&sImagePath=' + modifyUser.sAvatar"
+                          alt=""
+                          class="setting-avatar"
+                        />
+                        <button
+                          class="btn btn-primary btn-sm"
+                          v-show="isEdit"
+                          @click="handleClickAvatar"
+                        >
+                          上传头像
+                        </button>
+                        <input
+                          type="file"
+                          class="hidden-file"
+                          ref="file"
+                          @change="handleUploadFile"
+                        />
+                        <!-- <input type="text" /> -->
+                      </div>
+                    </li>
+                    <li class="setting-item">
+                      <span>登录账号</span>
+                      <div>
+                        <input
+                          type="text"
+                          class="form-control"
+                          :value="modifyUser.sUserName"
+                          disabled
+                        />
+                      </div>
+                    </li>
+                    <li class="setting-item">
+                      <span>日常昵称</span>
+                      <div>
+                        <input
+                          type="text"
+                          class="form-control"
+                          v-model="modifyUser.sDisplayName"
+                          :disabled="!isEdit"
+                        />
+                      </div>
+                    </li>
+                    <li class="setting-item">
+                      <span>性别</span>
+                      <div>
+                        <label class="radio-inline">
+                          <input
+                            type="radio"
+                            name="inlineRadioOptions"
+                            id="inlineRadio2"
+                            value="1"
+                            v-model="modifyUser.iSex"
+                            :disabled="!isEdit"
+                          />
+                          <span>男</span>
+                        </label>
+                        <label class="radio-inline">
+                          <input
+                            type="radio"
+                            name="inlineRadioOptions"
+                            id="inlineRadio3"
+                            value="0"
+                            v-model="modifyUser.iSex"
+                            :disabled="!isEdit"
+                          />
+                          <span>女</span>
+                        </label>
+                        <label class="radio-inline">
+                          <input
+                            type="radio"
+                            name="inlineRadioOptions"
+                            id="inlineRadio4"
+                            value="-1"
+                            v-model="modifyUser.iSex"
+                            :disabled="!isEdit"
+                          />
+                          <span>隐藏</span>
+                        </label>
+                      </div>
+                    </li>
+                    <li class="setting-item">
+                      <span>我的邮箱</span>
+                      <div>
+                        <input
+                          type="text"
+                          class="form-control"
+                          v-model="modifyUser.sEmail"
+                          :disabled="!isEdit"
+                        />
+                      </div>
+                    </li>
+                    <li class="setting-item">
+                      <span>我的手机</span>
+                      <div>
+                        <input
+                          type="text"
+                          class="form-control"
+                          v-model="modifyUser.sPhone"
+                          :disabled="!isEdit"
+                        />
+                      </div>
+                    </li>
+                    <li class="setting-item">
+                      <span>真实姓名</span>
+                      <div>
+                        <input
+                          type="text"
+                          class="form-control"
+                          v-model="modifyUser.sRealName"
+                          :disabled="!isEdit"
+                        />
+                      </div>
+                    </li>
+                    <li class="setting-item">
+                      <span>身份证号</span>
+                      <div>
+                        <input
+                          type="text"
+                          class="form-control"
+                          v-model="modifyUser.sIdentityCard"
+                          :disabled="!isEdit"
+                        />
+                      </div>
+                    </li>
+                    <li class="setting-item">
+                      <span>个人简介</span>
+                      <div>
+                        <textarea
+                          class="form-control"
+                          id=""
+                          rows="5"
+                          v-model="modifyUser.sDescription"
+                          :disabled="!isEdit"
+                        ></textarea>
+                      </div>
+                    </li>
+                    <li class="setting-item">
+                      <template v-if="isEdit">
+                        <button class="btn btn-primary" @click="submitEdit">
+                          确认修改资料
+                        </button>
+                        <button class="btn btn-default" @click="cancelEdit">
+                          取消
+                        </button>
+                      </template>
+                      <template v-else>
+                        <button class="btn btn-primary" @click="editSetting">
+                          编辑资料
+                        </button>
+                      </template>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <footer class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-xs-12 text-center">
+              ©Copyright - CoderChain. All Rights Reserved.
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <script src="../static/js/jquery-2.1.1.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/vue.min.js"></script>
+    <script src="../static/js/particles.min.js"></script>
+    <script src="../static/js/util.js"></script>
+    <script src="../static/js/index.js"></script>
+    <script src="../static/js/api/project.js"></script>
+    <script src="../static/js/api/user.js"></script>
+    <script>
+      function initVM() {
+        new Vue({
+          el: '#vm',
+          data: function() {
+            return {
+              isEdit: false,
+              defaultUser: {},
+              modifyUser: {
+                // sAvatar:
+                //   'https://avatar-static.segmentfault.com/280/048/2800483005-59ce20e4c64fd_big64',
+                // sUserName: '__mask__',
+                // sDisplayName: 'mask',
+                // iSex: '-1',
+                // sEmail: '923746590@qq.com',
+                // sPhone: '1571541',
+                // sRealName: '想学习',
+                // sIdentityCard: '44088478451212xxx'
+              }
+            }
+          },
+          computed: {},
+          created() {
+            this.fetchUserInfo()
+          },
+          methods: {
+            fetchUserInfo() {
+              userApi
+                .getUserInfo()
+                .then(data => {
+                  this.defaultUser = data
+                  this.modifyUser = data
+
+                  // 更新localStorage数据
+                  Util.setUserInfo(
+                    Object.assign({}, Util.getUserInfo(), {
+                      sAvatar: this.modifyUser.sAvatar,
+                      sDisplayName: this.modifyUser.sDisplayName,
+                      sUserName: this.modifyUser.sUserName
+                    })
+                  )
+
+                  console.log('获取到的用户data:', data)
+                })
+                .catch(err => Util.showErrorPanel)
+              // 获取到userId
+              // 赋值defaultUser和modifyUser
+            },
+            submitEdit() {
+              // 进行数据校验
+              Object.keys(this.modifyUser).forEach(key => {
+                this.modifyUser[key] = Util.trim(this.modifyUser[key])
+              })
+
+              let user = this.modifyUser
+              if (!user.sDisplayName) {
+                Util.showErrorPanel('日常昵称不能为空')
+                return
+              }
+
+              if (user.sEmail && !Util.isEmail(user.sEmail)) {
+                Util.showErrorPanel('请填入规范的邮箱格式')
+                return
+              }
+
+              if (user.sPhone && !Util.isPhone(user.sPhone)) {
+                Util.showErrorPanel('请填入规范的手机格式')
+                return
+              }
+
+              if (user.sIdentityCard) {
+                let msg = Util.isID(user.sIdentityCard)
+                if (msg !== true) {
+                  Util.showErrorPanel(msg)
+                  return
+                }
+              }
+
+              // 数据校验通过
+              userApi
+                .modifyInfo(this.modifyUser)
+                .then(data => {
+                  console.log(data)
+                  Util.showInfoPanel('修改信息成功')
+                  // 这里重新拉取一下信息
+                  this.fetchUserInfo()
+                  this.isEdit = false
+                  window.location.reload()
+                })
+                .catch(err => {
+                  console.log('修改失败：', err)
+                  Util.showErrorPanel(err)
+                })
+            },
+            cancelEdit() {
+              this.isEdit = false
+            },
+            editSetting() {
+              this.isEdit = true
+            },
+            handleClickAvatar() {
+              this.$refs.file.click()
+            },
+            handleUploadFile() {
+              let $files = this.$refs.file.files
+
+              console.log($files)
+              if (!$files.length) {
+                console.log('没有选择文件')
+                return
+              }
+
+              let $file = $files[0]
+
+              console.log('选择的文件：', $file)
+              let ext = Util.getExtName($file.name)
+
+              if (!Util.isImage(ext)) {
+                // 不是图片
+                Util.showErrorPanel('请选择图片')
+                return
+              }
+
+              let formData = new FormData()
+              formData.append('upload-file', $file)
+              formData.append('userId', '333')
+
+              // 这里调用上传文件接口
+              userApi
+                .uploadFile(formData)
+                .then(data => {
+                  console.log('上传文件成功')
+                  let sImagePath = data.sFileName
+                  this.modifyUser.sAvatar = sImagePath
+                })
+                .catch(err => {
+                  console.log('上传失败：', err)
+                  Util.showErrorPanel(err)
+                })
+              console.log(formData)
+            }
+          },
+          watch: {
+            modifyUser(val) {}
+          }
+        })
+      }
+
+      window.onload = function() {
+        initVM()
+      }
+    </script>
+  </body>
+</html>

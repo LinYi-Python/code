@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CoderChain, BlockChain">
+    <meta name="keywords" content="CoderChain, BlockChain">
+    <title>码农链前端开发页面开发模板 - CoderChain</title>
+    
+    <!-- 浏览器图标 -->
+    <!-- rel => relationship 描述当前页面和href所指定文档的关系 -->
+    <link rel="shortcut icon" href="https://coderchain.cn/static/images/logo/coderchain-logo.png" type="image/x-icon">
+    <link rel="icon" href="http://hiphotos.baidu.com/feed/pic/item/0e2442a7d933c89528e54ae1db1373f083020095.jpg">
+    
+    <link rel="stylesheet" href="https://coderchain.cn/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://coderchain.cn/static/css/style-no-override.css">
+    <link rel="stylesheet" href="https://coderchain.cn/static/css/chain.css">
+    <link rel="stylesheet" href="https://coderchain.cn/static/css/user.css">
+    
+    <!-- modernizr => 检测HTML5和CSS3特性的库，方便做出fallback，样式或功能回退 -->
+    <script src="https://coderchain.cn/static/js/modernizr.js"></script>
+    <!-- html5shiv支持html5标签，针对IE9以下 -->
+    <!-- respond.js针对不支持媒体查询的浏览器 -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <!-- 一些库文件 -->
+    <script src="https://coderchain.cn/static/js/jquery-2.1.1.js"></script>
+    <script src="https://coderchain.cn/static/js/bootstrap.min.js"></script>
+    <script src="https://coderchain.cn/static/js/vue.min.js"></script>
+    <script src="https://coderchain.cn/static/js/util.js"></script>
+</head>
+
+<body class="home">
+
+<section class="header" id="vm" v-cloak>
+    <!-- 导航栏 start-->
+    <nav class="navbar navbar-default menu">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-menu"
+                        aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="javascript:void(0)" class="navbar-brand bg-navbar">
+                    <!--<img src="https://app.denglu1.com/img/CoderChainLogo500.png" alt="CoderChain" class="logo">-->
+                    <img src="https://coderchain.cn/static/images/logo/coderchain-text-ch-white.png" alt="CoderChain"
+                         class="logo">
+                </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-menu">
+                <ul class="nav navbar-nav">
+                    <!--<li><a href="./index.html" class="link">社区主页</a></li>-->
+                    <li><a href="javascript:void(0)" class="link">创建项目</a></li>
+                    <li><a href="javascript:void(0)" class="link">查看所有项目</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="javascript:void(0)" class="link">我的项目</a></li>
+                    <li>
+                        <span>[用户：---]</span>
+                        <span>[代币：--- CDB]</span>
+                        <a href="javascript:void(0)" class="link">退出登录</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- 导航栏 end -->
+    
+    <!-- 内容区域 start -->
+    <div class="container box-container">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <!-- 面板标题 -->
+                <div class="panel-heading">
+                    <h3 class="panel-title">搜索</h3>
+                </div>
+                <!-- 面板内容 -->
+                <div class="panel-body">
+                    <!-- 在这里输入内容 -->
+                    <div>
+                        <label for="search-input">输入搜索内容</label>
+                        <input type="text" id="search-input" class="form-control" v-model="searchKey">
+                        <button class="btn btn-primary" style="margin-top: 20px;" @click="handleSubmit">提交</button>
+                    </div>
+                    <div>
+                        <h3>搜索结果</h3>
+                        <div class="">
+                            <ul>
+                                <li v-for="item in searchList">
+                                    <a href="">{{ item.name }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 内容区域 end -->
+</section>
+
+<footer>
+    <div class="address">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    ©Copyright - CoderChain. All Rights Reserved.
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+  window.onload = function () {
+    new Vue({
+      el: '#vm',
+      data() {
+        return {
+          searchList: [],
+          searchKey: ''
+        }
+      },
+      methods: {
+        handleSubmit(e) {
+          let that = this
+          let value
+
+          // 对数据进行处理
+          console.log('过滤前的值', this.searchKey)
+          value = Util.trim(this.searchKey)
+          console.log('过滤空格后的值', value)
+          
+          // 提交请求，搜索关键字
+          $.ajax({
+            method: 'get',
+            url: 'https://coderchain.cn/home/project-list.php',
+            success(res) {
+              let projectList = res.data
+              // 所有项目列表，然后在前端进行处理
+              // 根据key来搜索等等
+              that.searchList = projectList
+            },
+            error(err) {
+              console.log('error: ', err)
+            }
+          })
+        }
+      }
+    })
+  }
+</script>
+</body>
+</html>

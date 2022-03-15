@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>注册 - CoderChain</title>
+    <link rel="shortcut icon" href="../static/images/logo/coderchain-logo.png" type="image/x-icon">
+    <link rel="icon" href="../static/images/logo/coderchain-logo.png" type="image/x-icon">
+    <script>
+        console.log = function() {}
+
+        if (/(coderchain\.denglu1\.cn)/g.test(document.location.origin)) {
+            window.location.replace(document.location.href.replace('coderchain.denglu1.cn', 'coderchain.cn'))
+        }
+    </script>
+    <link rel="stylesheet" href="css/normalize.css"/>
+    <link rel="stylesheet" href="css/demo.css"/>
+    <!--必要样式-->
+    <link rel="stylesheet" href="css/component.css"/>
+    <link rel="stylesheet" href="css/style.css">
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="container demo-1">
+    <div class="content">
+        <div id="large-header" class="large-header">
+            <canvas id="demo-canvas"></canvas>
+            <div class="content-wrapper">
+                <div class="logo_box">
+                    <div class="logo-wrapper">
+                        <h1 class="logo">
+                            <a href="../index.html">
+                                <img src="https://app.denglu1.com/img/CoderChainLogo500.png" alt="">
+                            </a>
+                        </h1>
+                    </div>
+                    <div class="page-text">
+                        <h2>注册账号</h2>
+                    </div>
+                    <p class="msg-wrapper" id="msg">
+                    </p>
+                    <div class="qrcode">
+                        <div id="DengLu1_QRCode"></div>
+                    </div>
+                    <div class="input-wrapper">
+                        <div class="input_outer">
+                            <span class="u_user"></span>
+                            <input name="username" id="username" class="text" type="text" placeholder="请输入账户">
+                        </div>
+                        <div class="input_outer">
+                            <span class="us_uer"></span>
+                            <input name="password" id="password" class="text" value="" type="password"
+                                   placeholder="请输入密码">
+                        </div>
+                        <div class="input_outer">
+                            <span class="us_uer"></span>
+                            <input name="password2" class="text" id="password2" value="" type="password"
+                                   placeholder="请确认密码">
+                        </div>
+                        <div class="mb2">
+                            <input class="btn btn-primary" type="button" value="注册" id="btnRegister">
+                            <a href="login.html" class="btn">我已有账号</a>
+                            <!--<input type="hidden" name="sub">-->
+                            <!--<input class="act-but submit cancel" type="submit" value="取消" name="sublogin">-->
+                        </div>
+                    </div>
+                    <p class="tip">用登录易APP扫一扫注册</p>
+                    <div class="mb2 btn-group">
+                        <a href="login.html" class="btn">我已有账号</a>
+                        <input type="hidden" name="sub">
+                        <!--<input class="act-but submit cancel" type="submit" value="取消" name="sublogin">-->
+                    </div>
+                    <div class="download">
+                        <div class="login-by-denglu1">
+                            <!--<p>-->
+                                <!--<a href="javascript: void(0);" id="btnScannerRegister">-->
+                                    <!--<img src="../static/images/denglu1-blue.png" id="btnQRCode" width="22" height="22">-->
+                                    <!--<span>-->
+                                <!--登录易扫码注册-->
+                            <!--</span>-->
+                                <!--</a>-->
+                            <!--</p>-->
+                            <p>
+                                <a href="https://www.denglu1.cn/#section-download">
+                                    点击这里下载登录易
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="right">
+                        ©Copyright - CoderChain. All Rights Reserved.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- /container -->
+<script src="js/TweenLite.min.js"></script>
+<script src="js/EasePack.min.js"></script>
+<script src="js/rAF.js"></script>
+<script src="js/demo-1.js"></script>
+<script src="https://app.denglu1.com/js/base.js"></script>
+<!--<script type="text/javascript" src="https://app.denglu1.com/js/DengLu1.js?v=29"></script>-->
+<script src="js/DengLu1.js"></script>
+<script src="https://app.denglu1.com/js/JsonpEx.js"></script>
+<script src="js/register.js"></script>
+</body>
+
+<script type="text/javascript">
+  JsonpEx.domain = "coderchain.cn";
+
+  window.onload = function () {
+    buildRegisterQRCode();
+
+    $("#btnRegister").click(function() {
+        registerObj.registerEvent()
+    });
+  }
+</script>
+</html>

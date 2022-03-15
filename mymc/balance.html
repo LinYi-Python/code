@@ -1,0 +1,55 @@
+<!doctype>
+
+<html>
+
+
+
+<head>
+
+
+<script type="text/javascript">
+
+   
+
+    var Web3 = require('web3');
+
+    var web3 = new Web3();
+
+    web3.setProvider(new web3.providers.HttpProvider('ws://47.106.90.70:8547'));
+
+
+
+    function watchBalance() {
+
+                   alert('start');
+             web3.eth.getBalance('0x3E05A0b12a6D95480915EBa938F5De09ccF2f620').then(function (dBalance) {
+              alert("”√ªß”‡∂Ó"+dBalance);
+});
+alert('end');
+    }
+
+
+
+</script>
+
+</head>
+
+<body>
+
+    <h1>coinbase balance</h1>
+
+    <button type="button" onClick="watchBalance();">watch balance</button>
+
+    <div></div>
+
+    <div id="coinbase"></div>
+
+    <div id="original"></div>
+
+    <div id="current"></div>
+
+    <div id="diff"></div>
+
+</body>
+
+</html>

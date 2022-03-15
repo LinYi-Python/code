@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="CoderChain, BlockChain">
+    <meta name="keywords"
+          content="CoderChain, BlockChain">
+    <title>用户主页 - CoderChain</title>
+    <link rel="shortcut icon" href="../static/images/logo/coderchain-logo.png" type="image/x-icon">
+    <link rel="icon" href="../static/images/logo/coderchain-logo.png" type="image/x-icon">
+    <script>
+      if (/(coderchain\.denglu1\.cn)/g.test(document.location.origin)) {
+        window.location.replace(document.location.href.replace('coderchain.denglu1.cn', 'coderchain.cn'))
+      }
+    </script>
+    <script>
+      console.log = function () {
+      }
+    </script>
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/css/global.css">
+    <style>
+        .view-container h1 {
+            font-weight: 800;
+        }
+    </style>
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<main id="vm" v-cloak>
+    <section class="view-container">
+        <!--<div class="header-bg"></div>-->
+        <div id="particles-js"></div>
+        <custom-nav></custom-nav>
+        
+        <div class="container box-container">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"></h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="jumbotron">
+                            <h1 class="highlight-text">欢迎来到码农链</h1>
+                            <p>这是一个关于程序员的代码分享社区，在这里，你可以上传和分享你的代码，同时还有机会获得别人的肯定和得到代币奖励。快来参与吧！</p>
+                            <p><a class="btn btn-primary" href="./project-create.html" role="button">立即开始</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    ©Copyright - CoderChain. All Rights Reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+</main>
+<script src="../static/js/jquery-2.1.1.js"></script>
+<script src="../static/js/bootstrap.min.js"></script>
+<script src="../static/js/vue.min.js"></script>
+<script src="../static/js/particles.min.js"></script>
+<script src="../static/js/util.js"></script>
+<script src="../static/js/index.js"></script>
+<script>
+  function initVM() {
+    new Vue({
+      el: '#vm',
+    })
+  }
+
+  window.onload = function () {
+    initVM()
+  }
+</script>
+</body>
+</html>

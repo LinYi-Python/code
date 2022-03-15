@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="CoderChain, BlockChain">
+    <meta name="keywords"
+          content="CoderChain, BlockChain">
+    <title>项目详情 - CoderChain</title>
+    <link rel="shortcut icon" href="../static/images/logo/coderchain-logo.png" type="image/x-icon">
+    <link rel="icon" href="../static/images/logo/coderchain-logo.png" type="image/x-icon">
+    
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/css/global.css">
+    
+    <!--<link href="../static/css/style-no-override.css" rel="stylesheet">-->
+    <!--<link rel="stylesheet" href="../static/css/chain.css">-->
+    <!--<link rel="stylesheet" href="../static/css/user.css">-->
+    
+    <!--<link rel="stylesheet"-->
+    <!--href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css">-->
+    <!--&lt;!&ndash; 引入编辑器样式 &ndash;&gt;-->
+    <link rel="stylesheet" href="../static/lib/code-mirror/lib/codemirror.css">
+    <link rel="stylesheet" href="../static/lib/code-mirror/theme/monokai.css">
+    
+    <style>
+        .margin-bottom {
+            margin-bottom: 10px;
+        }
+        
+        .help-panel {
+            padding: 20px;
+        }
+        
+        .file-group p {
+            margin: 0;
+        }
+        
+        .CodeMirror pre {
+            font-family: Consolas;
+        }
+        
+        /* 重置编辑器样式 */
+        .editor-show-wrapper .CodeMirror {
+            height: auto;
+        }
+        
+        .editor-edit-wrapper .CodeMirror {
+            min-height: 800px;
+        }
+    
+    </style>
+    <script>
+      // console.log = function () {
+      // }
+    </script>
+    
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+<main id="vm" v-cloak>
+    <section class="view-container">
+        <div id="particles-js"></div>
+        <custom-nav ref="customNav"></custom-nav>
+        
+        <div class="container">
+            <div class="col-md-12" v-show="!showVotePanel">
+                
+                <div class="panel panel-default" v-show="showDirPanel">
+                    <div class="panel-heading" style="overflow: auto;">
+                        
+                        <h3 class="panel-title" style="float: left;">项目详情：
+                            <span
+                                    @click="handleJumpProject"
+                                    style="cursor: pointer; color: #2d71ed;"
+                            >/{{project | urlDecode}}/</span><span
+                                    v-for="(item, idx) in breadList"
+                                    @click="handleJumpDir(idx)"
+                                    style="cursor: pointer; color: #2d71ed;" v-if="idx + 1 < breadList.length">{{ item + '/' }}</span>
+                            <span v-else>{{ item + '/' }}</span></h3>
+                        
+                        <h3
+                                class="panel-title"
+                                style="cursor: pointer;color: #2d71ed;float: right;"
+                                @click="backToFormer"
+                        >
+                            <span class="glyphicon glyphicon-share-alt" style="transform: rotate(185deg)"></span>
+                            <span
+                            
+                            >返回上一级</span>
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="upload-file-wrapper">
+                            
+                            <!-- 按钮组 -->
+                            <div class="text-right btn-group-wrapper" style="display: block; overflow: auto;">
+                                
+                                <div class="loading" style="float: left" v-show="loading">
+                                    <!-- loading组件 -->
+                                    <div class="loading-container">
+                                        <div class="loading-wrapper">
+                                            <p style="color: #3a6bc6;font-weight: bold;">正在加载中...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="margin-bottom">
+                                    项目总投票数： {{supportCount}} CDB
+                                </div>
+                                <div class="margin-bottom">
+                                    <button class="btn btn-primary" @click="showVote" v-if="user != thisProjectUser">
+                                        给项目投票
+                                    </button>
+                                    <!--                       <button class="btn btn-primary" @click="viewProjectVoteDetail" v-else>项目投票情况</button> -->
+                                </div>
+                                <div class="btn-group margin-bottom" role="group" aria-label="..." v-show="isAdmin">
+                                    <button type="button" class="btn btn-default"
+                                            v-show="!showUploadPanel || !showCreateDirPanel || !showCreateNewFilePanel"
+                                            @click="switchCreateDirPanelState">创建目录
+                                    </button>
+                                    <button type="button" class="btn btn-default"
+                                            v-show="!showUploadPanel || !showCreateDirPanel || !showCreateNewFilePanel"
+                                            @click="switchCreateNewFilePanelState">创建文件
+                                    </button>
+                                    <button type="button" class="btn btn-default"
+                                            v-show="!showUploadPanel || !showCreateDirPanel || !showCreateNewFilePanel"
+                                            @click="switchUploadPanelState">上传文件
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 1 上传文件面板 -->
+                            <div v-show="showUploadPanel" class="panel panel-default help-panel">
+                                
+                                <div class="form-group">
+                                    <label for="uploadInputFile">请选择文件：</label>
+                                    <input type="file" id="uploadInputFile" ref="uploadFile">
+                                    <p>目前只支持上传一个文件</p>
+                                </div>
+                                <button class="btn btn-primary" @click="uploadFile">上传文件</button>
+                                <button class="btn btn-default" @click="hideAllHelpPanel">关闭</button>
+                            </div>
+                            
+                            <!-- 2 创建文件夹面板 -->
+                            <div v-show="showCreateDirPanel" class="panel panel-default help-panel">
+                                <div class="form-group">
+                                    <label for="newDirName">请输入文件夹名称：</label>
+                                    <input type="text" id="newDirName" class="form-control" placeholder="文件夹名字"
+                                           v-model="newDirName">
+                                </div>
+                                <button class="btn btn-primary" @click="createNewDir">创建</button>
+                                <button class="btn btn-default" @click="hideAllHelpPanel">关闭</button>
+                            </div>
+                            
+                            <!-- 3 创建文件面板 -->
+                            <div v-show="showCreateNewFilePanel" class="panel panel-default help-panel">
+                                
+                                <div class="form-group">
+                                    <label for="newFileName">请填写文件名字：</label>
+                                    <input type="text" id="newFileName" class="form-control" placeholder="新文件名字"
+                                           v-model="newFile.name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="editor-new">请输入文件内容：</label>
+                                    <!-- 富文本 -->
+                                    <textarea id="editor-new"></textarea>
+                                </div>
+                                
+                                <button class="btn btn-primary" @click="createNewFile">创建文件</button>
+                                <button class="btn btn-default" @click="hideAllHelpPanel">关闭</button>
+                            </div>
+                        
+                        </div>
+                        <ul class="list-group file-group">
+                            <li class="list-group-item" v-if="projectContentList && projectContentList.length == 0">
+                                还没有文件，快点上传吧
+                            </li>
+                            
+                            <template v-else>
+                                
+                                <li class="list-group-item" v-for="project in dirList">
+                                    <!-- 先输出目录 -->
+                                    <p style="cursor: pointer;overflow: auto;line-height: 30px;"
+                                       @click="handleClickDir(project)">
+                                        <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+                                        &nbsp;
+                                        {{ project.name }}
+                                        
+                                        <button v-if="isAdmin" class="btn btn-danger"
+                                                style="float: right; font-size: 12px;"
+                                                @click.stop="deleteDir(project.name)">删除
+                                        </button>
+                                    </p>
+                                </li>
+                                <!-- 再输出文件 -->
+                                <li class="list-group-item" v-for="project in fileList">
+                                    <p style="cursor: pointer;"
+                                       @click="handleClickFile(project)">
+                                        <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
+                                        &nbsp;
+                                        {{ project.name }}
+                                        <button v-if="isAdmin" class="btn btn-danger"
+                                                style="float: right; font-size: 12px;margin-top: -5px;"
+                                                @click.stop="deleteFileImmediately(project)">删除
+                                        </button>
+                                    </p>
+                                </li>
+                            </template>
+                        </ul>
+                        
+                        <div class="m-tip">
+                            <p style="color: #f00;"><strong>用户须知：</strong></p>
+                            <p>1. Chrome浏览器下载docx文件后默认会解析成zip后缀，用户需要手动把zip后缀改成docx后缀即可正常访问</p>
+                            <p>2. 如果打开下载的文件遇到错误，请先解除文件的锁定(方法：右键打开文件属性->勾上解除锁定)</p>
+                            <p>3. 下载下来的文件名称默认是一串哈希(hash)，没有文件后缀，请选择合适的打开方式</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 具体文件内容的列表 -->
+                <div class="panel panel-default" v-show="!showDirPanel">
+                    <div class="panel-heading" style="overflow: hidden;">
+                        <h3 class="panel-title">项目详情：
+                            <span
+                                    @click="handleJumpProject"
+                                    style="cursor: pointer; color: #2d71ed;"
+                            >/{{ project | urlDecode}}/</span><span
+                                    v-for="(item, idx) in breadList"
+                                    @click="handleJumpDir(idx)"
+                                    style="cursor: pointer; color: #2d71ed;" v-if="idx + 1 < breadList.length">{{ item + '/' }}</span><span
+                                    v-else>{{ item + '/' }}</span><span>{{ file.name }}</span>
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="text-right btn-group-wrapper" style="display: block;">
+                            <!-- loading -->
+                            <div class="loading" style="float: left" v-show="loading">
+                                <!-- loading组件 -->
+                                <div class="loading-container">
+                                    <div class="loading-wrapper">
+                                        <p style="color: #3a6bc6;font-weight: bold;">正在加载中...</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="btn-group margin-bottom" role="group" aria-label="...">
+                                <template v-if="isHTMLType(file.name)">
+                                    <a class="btn btn-default" target="_blank"
+                                       :href="'http://121.201.35.141:18080/ipfs/' + file.hash">预览</a>
+                                </template>
+                                <template v-if="file.name == 'template.html'">
+                                    <a :download="file.name" :href="'./' + file.name" class="btn btn-default">下载文件</a>
+                                </template>
+                                <button v-show="isAdmin" type="button" class="btn btn-default"
+                                        @click="switchEditPanel(true)">编辑文件
+                                </button>
+                                <button v-show="isAdmin" type="button" class="btn btn-default" @click="deleteFile">删除文件
+                                </button>
+                                <button type="button" class="btn btn-default"
+                                        @click="switchDirPanel">关闭文件
+                                </button>
+                            </div>
+                        </div>
+                        <div class="" v-show="showEditPanel">
+                            <div class="form-group editor-edit-wrapper">
+                                <textarea id="editor-edit"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" @click="saveFile">保存</button>
+                                <button class="btn btn-default" @click="switchEditPanel(false)">取消编辑</button>
+                            </div>
+                        </div>
+                        <!--
+                                            <div v-show="!showEditPanel" v-html="plainFileContent" ref="code">
+                                            </div> -->
+                        <!-- <pre v-show="!showEditPanel"><code ref="code" v-text="file.fileContent"></code></pre> -->
+                        <div v-show="!showEditPanel" class="editor-show-wrapper">
+                            <textarea id="editor-show"></textarea>
+                            <!--<pre><code>-->
+                            <!--<div v-html="postHtmlContent" v-highlight></div>-->
+                            <!--</code>-->
+                            <!--</pre>-->
+                        </div>
+                        <!-- 可以编辑的文件 -->
+                    
+                    </div>
+                </div>
+            
+            </div>
+            
+            <div class="col-md-12" v-show="showVotePanel">
+                <div class="panel panel-default">
+                    <div class="panel-heading" style="overflow: auto;">
+                        <h3 class="panel-title" style="float: left;">项目名称：
+                            <span
+                                    @click="handleJumpProject"
+                                    style="cursor: pointer; color: #2d71ed;"
+                            >{{project | urlDecode}}</span>
+                        </h3>
+                        
+                        <h3
+                                class="panel-title"
+                                style="cursor: pointer;color: #2d71ed;float: right;"
+                                @click="closeVote"
+                        >
+                            <span class="glyphicon glyphicon-remove" style="transform: rotate(185deg)"></span>
+                            <span>关闭</span>
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                        <!-- 这里放投票程序 -->
+                        <div class="form-group">
+                            <label for="voteTokenInput">支持的Token（CDB）个数：</label>
+                            <input type="text" id="voteTokenInput" class="form-control" v-model="voteTokenNum"
+                                   placeholder="请输入您要支持的Token数" style="width: 200px;">
+                        </div>
+                        <button class="btn btn-primary" @click="vote" :disabled="loading ? 'disabled' : false ">立即投票
+                        </button>
+                        
+                        <!-- loading -->
+                        <div class="loading" v-show="loading" style="margin-top: 10px;">
+                            <!-- loading组件 -->
+                            <div class="loading-container">
+                                <div class="loading-wrapper">
+                                    <p style="color: #3a6bc6;font-weight: bold;">正在处理中，请耐心等待...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    ©Copyright - CoderChain. All Rights Reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+    <return-top></return-top>
+</main>
+
+<script src="../static/js/jquery-2.1.1.js"></script>
+<script src="../static/js/bootstrap.min.js"></script>
+<script src="../static/js/vue.min.js"></script>
+<script src="../static/js/particles.min.js"></script>
+<script src="../static/js/util.js"></script>
+<script src="../static/js/index.js"></script>
+<script src="../static/js/pagination.js"></script>
+<script src="../static/js/api/project.js"></script>
+
+<!--<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>-->
+<!--<script type="text/javascript" src="../static/js/highlightjs-line-numbers.js"></script>-->
+<!--&lt;!&ndash; 引入marked解析器 &ndash;&gt;-->
+<!--<script src="https://cdn.bootcss.com/marked/0.5.1/marked.min.js"></script>-->
+
+<!-- 引入编辑器js -->
+<script src="../static/lib/code-mirror/lib/codemirror.js"></script>
+<script src="../static/lib/code-mirror/mode/javascript/javascript.js"></script>
+<script src="../static/lib/code-mirror/mode/htmlembedded/htmlembedded.js"></script>
+
+<script>
+  var editor
+  var urlParamObj = Util.parseUrlParams()
+  var project = urlParamObj.project 
+
+  var user = urlParamObj.user
+
+  if (!project || !user) {
+    // 没有项目参数，非法
+    Util.showErrorPanel('参数不合法')
+    window.location.replace('./project-index.html')
+  }
+
+  project = decodeURIComponent(project)
+
+  window.onload = function () {
+    /*
+    Vue.directive('highlight', (el) => {
+      let blocks = el.querySelectorAll('pre code')
+      blocks.forEach((block) => {
+        hljs.highlightBlock(block)
+      })
+    })
+    */
+
+    // 根据这个project参数来查找该文件名
+    initVM()
+
+    function initVM() {
+      new Vue({
+        el: '#vm',
+        data: {
+          breadList: [], // 文件路径
+          projectContentList: [],
+          dirList: [],
+          fileList: [],
+          file: {
+            fileContent: '',
+            hash: '',
+            name: ''
+          },
+          fileContent: '',
+          newDirName: '',
+          newFile: {
+            name: '',
+            content: ''
+          },
+          project: project,
+          editFileContent: '',
+          user: Util.getUserAddr(),
+          thisProjectUser: user ? user : '',
+          voteTokenNum: 5,
+          supportCount: '---',
+          showVotePanel: false,
+          showUploadPanel: false,
+          showDirPanel: true,
+          showEditPanel: false,
+          showCreateDirPanel: false,
+          showCreateNewFilePanel: false,
+          isAdmin: false, // 是否是项目的拥有者
+          loading: true,
+          initProject: false, // 防止重新拉取项目投票情况
+
+          // 编辑器
+          editor1: null,
+          editor2: null,
+          editor3: null
+        },
+        computed: {
+          filePath: function () {
+            if (!this.breadList.length) {
+              return '/' + project
+            }
+            var htmlArr = []
+
+            htmlArr = this.breadList.map(function (item, idx) {
+              return '<span style="cursor: pointer;" @click="handleJumpDir(idx)">' + item + '</span>'
+            })
+
+            return '/' + project + '/' + htmlArr.join('/') + '/'
+          },
+          /*
+          postHtmlContent() {
+            return this.file.fileContent ? marked(this.file.fileContent) : ''
+          }
+          */
+        },
+        created: function () {
+          this.fetchProjectDetail()
+          if (user === this.user) {
+            // 是这个项目的拥有者
+            this.isAdmin = true
+          }
+        },
+        watch: {
+          // vue对象深层监听
+          file: {
+            handler: function (newVal) {
+              var that = this
+              if (this.file.fileContent == null) {
+                return
+              }
+
+              console.log('文件内容发生变化了')
+
+              this.$nextTick(function () {
+                console.log('开始代码高亮...')
+                // that.editor2 =
+                // Util.hightBlock(that.$refs.code)
+                // Util.hightBlock(that.$refs.newCode)
+                if (!that.editor2) {
+                  // 初始化编辑器
+                  var text = document.getElementById('editor-show')
+                  that.editor2 = CodeMirror.fromTextArea(text, {
+                    lineNumbers: true,
+                    theme: 'monokai',
+                    matchBrackets: true,
+                    // autofocus: true,\
+                    showCursorWhenSelecting: true,
+                    readOnly: 'nocursor',
+                    // mode: 'markdown'
+                  });
+
+
+                  that.editor2.setValue(newVal.fileContent);
+                  that.editor2.refresh();
+                  // this.editor2.focus();
+                } else {
+                  that.editor2.setValue(newVal.fileContent)
+                  that.editor2.refresh();
+                }
+
+                // 初始化编辑内容
+                if (!that.editor3) {
+                  // 初始化编辑器
+                  var text = document.getElementById('editor-edit')
+                  that.editor3 = CodeMirror.fromTextArea(text, {
+                    lineNumbers: true,
+                    theme: 'monokai',
+                    matchBrackets: true,
+                    // autofocus: true,\
+                    showCursorWhenSelecting: true,
+                    // readOnly: 'nocursor'
+                  });
+
+
+                  that.editor3.refresh();
+                  that.editor3.setValue(newVal.fileContent);
+                  // that.editor3.focus();
+
+                } else {
+                  that.editor3.setValue(newVal.fileContent)
+                  console.log('editor3 焦点')
+                  that.editor3.focus();
+                }
+
+              })
+            },
+            deep: true, // 监听对象的属性
+            immediate: true // 回调函数中立即是新值
+          },
+        },
+        filters: {
+          urlDecode: function (value) {
+            return decodeURIComponent(value)
+          }
+        },
+        methods: {
+          fetchProjectDetail: function () {
+
+            // 拉取数据
+            if (!project) {
+              console.log('没有传入项目id')
+              return
+            }
+
+            var that = this
+            var sPath = ''
+            if (!this.breadList.length) {
+              sPath = ' '
+            } else {
+              sPath = this.breadList.join('/')
+            }
+
+            this.showLoading()
+
+            projectApi.getProjectDetail(project, sPath, user).then(function (data) {
+              if (data == null) {
+                return alert('拉取到的是空数据，错误')
+              }
+              that.projectContentList = data
+              that.projectContentList.sort(Util.compare)
+              that.fileList = []
+              that.dirList = []
+
+              // 过滤目录和文件
+              that.projectContentList.forEach(function (item) {
+                if (item.type == 'file') {
+                  that.fileList.push(item)
+                } else {
+                  that.dirList.push(item)
+                }
+              })
+              console.log('拉取的结果：', data)
+              that.hideLoading()
+
+
+              if (that.initProject) {
+                return
+              }
+
+              // 继续拉取Token
+              console.log('拉取项目的投票详情')
+              that.fetchProjectVoteNum()
+            }).catch(function (err) {
+              console.log('拉取错误：', err)
+              Util.showErrorPanel(err)
+              that.hideLoading()
+            })
+          },
+          handleClickDir: function (dir) {
+            var that = this
+            // 目录点击了
+            // 获取目录的内容，添加目录路径
+            that.breadList.push(dir.name)
+
+            // 目录路径
+            var sPath = that.breadList.join('/')
+            // 拉取目录内容
+            this.showLoading()
+            projectApi.getProjectDetail(project, sPath, user).then(function (data) {
+              that.projectContentList = data
+              that.projectContentList.sort(Util.compare)
+              that.fileList = []
+              that.dirList = []
+
+              // 过滤目录和文件
+              that.projectContentList.forEach(function (item) {
+                if (item.type == 'file') {
+                  that.fileList.push(item)
+                } else {
+                  that.dirList.push(item)
+                }
+              })
+
+              that.hideLoading()
+              console.log('拉取文件夹成功')
+            }).catch(function (err) {
+              Util.showErrorPanel(err)
+              that.hideLoading()
+            })
+
+            console.log('此时的面包导航：', that.breadList)
+          },
+          handleJumpDir: function (idx) {
+            // 目录跳转
+            // 获取当前点击的索引
+            console.log('点击了：', idx)
+            console.log('list: ', this.breadList)
+            this.breadList.splice(idx + 1)
+            console.log('list after: ', this.breadList)
+            this.fetchProjectDetail()
+            // 展示目录
+            this.showDirPanel = true
+          },
+          handleJumpProject: function () {
+            // 页面刷新
+            window.location.reload()
+          },
+          handleClickFile: function (file) {
+            var that = this
+            // 文件点击了
+            console.log('文件名：', file.name)
+            console.log('文件哈希：', file.hash)
+
+            // 判断是不是图片，如果是，直接跳转新页面
+            var res = file.name.split('.')
+            var ext
+
+            if (res.length > 1) {
+              ext = res[res.length - 1].toLowerCase()
+              // 查看是不是直接查看的资源，这个要下载
+              // if (Util.isUnSupportedType(ext)) {
+              //   // 打开一个新窗口下载
+              // }
+
+              if (Util.isResourceType(ext)) {
+                // 跳转
+                // var url = 'http://47.106.90.70:50013/ipfs/' + file.hash
+                var url = 'http://121.201.35.141:18080/ipfs/' + file.hash
+                window.open(url)
+                return
+              }
+
+            }
+
+
+            this.file = file
+            this.showDirPanel = false
+
+            // 请求文件内容
+            this.showLoading()
+            projectApi.getFileContent(this.file.hash).then(function (content) {
+              console.log('返回的结果是: ', content)
+              // that.$nextTick(function() {
+              // 设置editFileContent的内容\ufeff
+              var content = decodeURIComponent(content.oRet.sMsg);
+              // console.log(content)
+              // console.log(content.indexOf('•'))
+              // console.log(content.indexOf('\ufeff'))
+              // 这个替换掉window记事本ascii到utf8编码转换的错误字符
+              if (content.indexOf('\ufeff') > -1) {
+                content = content.replace('\ufeff', '')
+              }
+              that.editFileContent = content
+              Vue.set(that.file, 'fileContent', content)
+              that.hideLoading()
+
+              // })
+              // hljs.initHighlightingOnLoad();
+              // console.log(that.file.fileContent.startsWith('"'))
+            }).catch(function (err) {
+              Util.showErrorPanel(err)
+            })
+          },
+          switchUploadPanelState: function () {
+            this.hideAllHelpPanel()
+            this.showUploadPanel = !this.showUploadPanel
+          },
+          switchCreateDirPanelState: function () {
+            this.hideAllHelpPanel()
+            this.showCreateDirPanel = !this.showCreateDirPanel
+          },
+          switchCreateNewFilePanelState: function () {
+            var that = this
+            this.hideAllHelpPanel()
+
+            this.showCreateNewFilePanel = !this.showCreateNewFilePanel
+
+            if (!this.editor1) {
+              // 初始化编辑器
+              var text = document.getElementById('editor-new')
+              this.editor1 = CodeMirror.fromTextArea(text, {
+                lineNumbers: true,
+                theme: 'monokai',
+                matchBrackets: true,
+                // autofocus: true,\
+                showCursorWhenSelecting: true
+              });
+              editor = this.editor1
+              this.$nextTick(function () {
+                console.log('下次更新时刷新新建文件内容')
+                that.editor1.refresh();
+                that.editor1.focus();
+                that.editor1.setValue('');
+                // that.editor1.getDoc().getSelection()
+              })
+
+
+              console.log('初始化文本成功：', this.editor1)
+            }
+          },
+          createNewDir: function () {
+            var that = this
+            // 创建新目录
+            // 合法检查
+            this.newDirName = Util.trim(this.newDirName)
+
+            if (this.newDirName == '') {
+              return Util.showErrorPanel('文件夹名不能为空')
+            }
+
+            // if (Util.containsBlank(this.newDirName)) {
+            //   return Util.showErrorPanel('文件夹名称不能包含空格')
+            // }
+
+            var path = ''
+            if (!this.breadList.length) {
+              path = this.newDirName
+            } else {
+              path = this.breadList.join('/') + '/' + this.newDirName
+            }
+            this.showLoading()
+            projectApi.createNewDir(project, path).then(function (data) {
+              // 创建成功，重新拉取目录
+              that.fetchProjectDetail()
+              that.hideAllHelpPanel()
+              Util.showInfoPanel('创建文件夹"' + that.newDirName + '"成功')
+              that.newDirName = ''
+            }).catch(function (err) {
+              Util.showErrorPanel(err)
+            })
+          },
+          uploadFile: function () {
+            // 上传文件，获取当前目录
+            var that = this
+            console.log('准备上传文件')
+
+            var $file = document.querySelector('[type=file]').files[0]
+
+            console.log('获取到的文件对象: ', $file)
+            if (!$file) {
+              Util.showErrorPanel('请选择要上传的文件')
+              return
+            }
+
+            // 这里增加一层对文件类型的约束
+
+            console.log('文件: ', $file)
+            var res = $file.name.split('.')
+            var ext
+
+            if (res.length > 1) {
+              ext = res[res.length - 1].toLowerCase()
+
+              if (Util.isUnSupportedType(ext)) {
+                Util.showErrorPanel('暂不支持上传该类型的文件，后续会考虑支持')
+                return
+              }
+
+              if (Util.isPackageType(ext)) {
+                Util.showErrorPanel('项目内不支持压缩包上传，如有需要，请新建项目')
+                return
+              }
+
+            }
+
+            console.log('ext:', ext)
+            // return;
+            var formData = new FormData()
+            formData.append('upload-file', $file)
+
+            if (!that.breadList.length) {
+              //
+              formData.append('sPath', ' ')
+            } else {
+              formData.append('sPath', that.breadList.join('/'))
+            }
+
+            formData.append('sProjectName', project)
+
+            this.showLoading()
+            projectApi
+              .saveFile(formData)
+              .then(function (res) {
+                console.log('上传文件结果：', res)
+                Util.showInfoPanel('上传文件成功')
+                that.fetchProjectDetail()
+                that.hideAllHelpPanel()
+              })
+              .catch(function (err) {
+                console.log('上传文件结果：', err)
+                Util.showErrorPanel(err.retMsg)
+                that.hideLoading()
+              })
+
+          },
+          switchDirPanel: function () {
+            this.showDirPanel = !this.showDirPanel
+          },
+          switchEditPanel: function (status) {
+            var that = this
+            if (status == undefined) {
+              this.showEditPanel = !this.showEditPanel
+            } else {
+              this.showEditPanel = status
+            }
+
+            this.$nextTick(function () {
+              if (that.showEditPanel) {
+                // this.editor3.setValue(this.file.fileContent)
+                console.log('要刷新编辑内容了')
+                that.editor3.refresh()
+                that.editor3.focus()
+              }
+            })
+
+
+          },
+          saveFile: function () {
+            // 保存文件新内容
+            var that = this
+            console.log('正在保存文件内容...')
+
+            var formData = new FormData()
+
+            // 添加项目名
+            formData.append('sProjectName', project)
+            // 添加文件路径
+            if (!that.breadList.length) {
+              //
+              formData.append('sPath', that.file.name)
+            } else {
+              formData.append('sPath', that.breadList.join('/') + '/' + that.file.name)
+            }
+
+
+            var newFileContent = that.editor3.getValue()
+            if (newFileContent == '') {
+              formData.append('sData', ' ')
+            } else {
+              formData.append('sData', newFileContent)
+            }
+
+            this.showLoading()
+            projectApi
+              .saveFile(formData, 'updateContent')
+              .then(function (res) {
+                console.log('修改文件结果：', res)
+                Util.showInfoPanel('修改文件成功')
+                that.fetchProjectDetail()
+                that.file.fileContent = decodeURIComponent(that.editor3.getValue())
+                that.switchEditPanel(false)
+              })
+              .catch(function (err) {
+                console.log('修改文件结果：', err)
+                Util.showErrorPanel(err.retMsg)
+                that.hideLoading()
+              })
+          },
+          deleteFile: function () {
+            // 删除文件内容
+            var that = this
+            console.log('正在删除文件内容...')
+
+            if (!window.confirm('确认删除文件"' + that.file.name + '"吗, 操作不可撤销？')) {
+              return
+            }
+
+            sPath = ''
+            // 添加文件路径
+            if (!that.breadList.length) {
+              //
+              sPath = that.file.name
+            } else {
+              sPath = that.breadList.join('/') + '/' + that.file.name
+            }
+            this.showLoading()
+            projectApi
+              .deleteFile(project, sPath)
+              .then(function (res) {
+                console.log('删除文件结果：', res)
+                Util.showInfoPanel('删除文件成功')
+                that.switchEditPanel(false)
+                // 重新拉取数据
+                that.fetchProjectDetail()
+                that.showDirPanel = true
+              })
+              .catch(function (err) {
+                Util.showErrorPanel(err)
+                this.hideLoading()
+              })
+          },
+          deleteFileImmediately: function (file) {
+            // 删除文件内容
+            var that = this
+            console.log('正在删除文件内容...')
+
+            if (!window.confirm('确认删除文件"' + file.name + '"吗, 操作不可撤销？')) {
+              return
+            }
+
+            sPath = ''
+            // 添加文件路径
+            if (!that.breadList.length) {
+              //
+              sPath = file.name
+            } else {
+              sPath = that.breadList.join('/') + '/' + file.name
+            }
+            this.showLoading()
+            projectApi
+              .deleteFile(project, sPath)
+              .then(function (res) {
+                console.log('删除文件结果：', res)
+                Util.showInfoPanel('删除文件成功')
+                // 重新拉取数据
+                that.fetchProjectDetail()
+              })
+              .catch(function (err) {
+                Util.showErrorPanel(err)
+                that.hideLoading()
+              })
+          },
+          hideAllHelpPanel: function () {
+            // 隐藏创建目录，创建文件和上传文件面板
+            this.showUploadPanel = false
+            this.showCreateDirPanel = false
+            this.showCreateNewFilePanel = false
+          },
+          createNewFile: function () {
+            // 创建新文件
+            // 保存文件新内容
+            var that = this
+
+            if (!this.newFile.name) {
+              return Util.showErrorPanel('文件名不能为空')
+            }
+            this.newFile.name = Util.trim(this.newFile.name)
+
+            if (this.newFile.name == '') {
+              return Util.showErrorPanel('文件名名不能为空')
+            }
+
+            if (this.newFile.name.length > 64) {
+              return Util.showErrorPanel('文件名不能超过64位')
+            }
+
+            if (!Util.isValidFileName(this.newFile.name)) {
+              return Util.showErrorPanel(`文件名非法，不能包含 ${Util.ERR_FILENAME_MSG} 等特殊字符`)
+            }
+
+            console.log('正在新建文件内容...')
+
+            var formData = new FormData()
+
+            // 添加项目名
+            formData.append('sProjectName', project)
+            // 添加文件路径
+            if (!that.breadList.length) {
+              //
+              formData.append('sPath', that.newFile.name)
+            } else {
+              formData.append('sPath', that.breadList.join('/') + '/' + that.newFile.name)
+            }
+
+            console.log('内容1：', this.editor1.getValue())
+            var newFileContent = this.editor1.getValue()
+            // console.log('替换后的内容：', that.newFile.content.replace(/\n/g, '\r\n'))
+            if (newFileContent == '') {
+              console.log('append 空字符串')
+              formData.append('sData', ' ')
+            } else {
+              console.log('准备替换')
+              // 转义
+              formData.append('sData', newFileContent)
+            }
+
+            this.showLoading()
+
+            projectApi
+              .saveFile(formData, 'updateContent')
+              .then(function (res) {
+                console.log('创建文件结果：', res)
+                Util.showInfoPanel('创建文件成功')
+                that.fetchProjectDetail()
+                that.hideAllHelpPanel()
+
+                // 重置内容
+                that.editor1.setValue('')
+                that.newFile.name = ''
+              })
+              .catch(function (err) {
+                console.log('创建文件结果：', err)
+                Util.showErrorPanel(err.retMsg)
+                that.hideLoading()
+              })
+
+          },
+          backToFormer() {
+            // 返回上一级
+            console.log('返回上一级')
+
+            if (!this.breadList.length) {
+              // 跳转回全部项目
+              window.history.back()
+            } else {
+              this.breadList.pop()
+              this.fetchProjectDetail()
+            }
+          },
+          deleteDir(name) {
+            // 删除目录
+            var that = this
+            console.log('正在删除目录...')
+
+            if (!window.confirm('确认删除目录"' + name + '"吗, 操作不可撤销？')) {
+              return
+            }
+
+            sPath = ''
+            // 添加文件路径
+            if (!that.breadList.length) {
+              //
+              sPath = name
+            } else {
+              sPath = that.breadList.join('/') + '/' + name
+            }
+
+            this.showLoading()
+
+            projectApi
+              .deleteFile(project, sPath)
+              .then(function (res) {
+                Util.showInfoPanel('删除目录"' + name + '"成功')
+                // 重新拉取数据
+                that.fetchProjectDetail()
+              })
+              .catch(function (err) {
+                Util.showErrorPanel(err)
+                that.hideLoading()
+              })
+          },
+          showLoading: function () {
+            this.loading = true
+          },
+          hideLoading: function () {
+            this.loading = false
+          },
+          showVote: function () {
+            console.log('给项目投票')
+            console.log(project)
+            console.log(user)
+            console.log(this.user)
+
+            this.showVotePanel = true
+          },
+          viewProjectVoteDetail: function () {
+            console.log('查看我的投票情况')
+          },
+          vote: function () {
+            // 投票
+            var that = this
+            console.log('投票：', this.voteTokenNum)
+
+            if (isNaN(this.voteTokenNum) || (this.voteTokenNum != parseInt(this.voteTokenNum))) {
+              return Util.showErrorPanel('投币数必须是数字且为整数')
+            }
+
+            if (this.voteTokenNum <= 0) {
+              return Util.showErrorPanel('投票币数不能小于0')
+            }
+
+            if (this.voteTokenNum > 100) {
+              return Util.showErrorPanel('投票币数不能超过100')
+            }
+
+            if (this.$refs.customNav && this.voteTokeNum <= this.$refs.customNav.userToken) {
+              return Util.showErrorPanel('你的币数不够了，快去赚币吧')
+            }
+
+            that.showLoading()
+            projectApi.vote(project, this.thisProjectUser, this.voteTokenNum, this.user).then(function (data) {
+              Util.showInfoPanel('投票成功')
+              console.log('投票过后的数据：', data)
+              that.hideLoading()
+              that.fetchProjectVoteNum()
+              // 刷新自己的代币
+              that.$refs.customNav.getToken()
+              that.showVotePanel = false
+            }).catch(function (err) {
+              Util.showErrorPanel(err)
+              console.log(err)
+              that.hideLoading()
+            })
+          },
+          closeVote: function () {
+            this.showVotePanel = false
+          },
+          fetchProjectVoteNum: function () {
+            var that = this
+            projectApi.getProjectSupportCount(project, that.thisProjectUser).then(function (data) {
+              that.supportCount = data
+              // Util.showInfoPanel('拉取投票数据成功')
+              that.initProject = true
+
+            }).catch(function (err) {
+              Util.showErrorPanel('拉取投票数据失败')
+            })
+          },
+          isHTMLType: function (filename) {
+            let ext = Util.getExtName(filename)
+            return ext === 'html'
+          }
+        }
+      })
+    }
+  }
+</script>
+</body>
+</html>

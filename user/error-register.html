@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>操作结果 - CoderChain</title>
+    <link rel="shortcut icon" href="../static/images/logo/coderchain-logo.png" type="image/x-icon">
+    <link rel="icon" href="../static/images/logo/coderchain-logo.png" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="css/normalize.css"/>
+    <link rel="stylesheet" type="text/css" href="css/demo.css"/>
+    <!--必要样式-->
+    <link rel="stylesheet" type="text/css" href="css/component.css"/>
+    <link rel="stylesheet" href="css/style.css">
+    <!--[if IE]>
+    <script src="js/html5.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="container demo-1">
+    <div class="content">
+        <div id="large-header" class="large-header">
+            <canvas id="demo-canvas"></canvas>
+            <div class="content-wrapper">
+                <div class="logo_box">
+                    <div class="logo-wrapper">
+                        <h1 class="logo">
+                            <img src="https://app.denglu1.com/img/CoderChainLogo500.png" alt="">
+                        </h1>
+                    </div>
+                    <div class="page-text">
+                        <h2>操作结果</h2>
+                    </div>
+                    <div style="color: #f00;" class="success-wrapper">
+                        <p id="sMsg">
+                        
+                        </p>
+                        <a href="./register.html" class="btn btn-primary">重新注册</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- /container -->
+<script src="js/TweenLite.min.js"></script>
+<script src="js/EasePack.min.js"></script>
+<script src="js/rAF.js"></script>
+<script src="js/demo-1.js"></script>
+<script type="text/javascript" src="https://app.denglu1.com/js/jquery-1.8.0.min.js"></script>
+<script>
+    window.onload = function(e) {
+      let hash = window.location.hash
+      let $msg = document.getElementById('sMsg')
+      if (hash && hash.startsWith('#msg')) {
+        hash = hash.replace('#msg=', '')
+        if (hash === 'exists') {
+          $msg.innerText = '账号已经存在，请重新选择'
+        } else if (hash === 'empty') {
+          $msg.innerText = '账号和密码信息必须填写完整'
+        } else if (hash === 'notequal') {
+          $msg.innerText = '两次密码不一致'
+        } else {
+          $msg.innerText = '注册失败，请重新尝试'
+        }
+      }
+    }
+</script>
+</body>
+</html>

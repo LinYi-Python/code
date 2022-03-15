@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="CoderChain, BlockChain" />
+    <meta name="keywords" content="CoderChain, BlockChain" />
+    <title>创建项目 - CoderChain</title>
+    <link
+      rel="shortcut icon"
+      href="../static/images/logo/coderchain-logo.png"
+      type="image/x-icon"
+    />
+    <link
+      rel="icon"
+      href="../static/images/logo/coderchain-logo.png"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../static/css/global.css" />
+    <style>
+      .project-input {
+        max-width: 360px;
+      }
+
+      .tip {
+        margin-top: 10px;
+      }
+    </style>
+    <script>
+      // console.log = function () {
+      // }
+    </script>
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <main id="vm" v-cloak>
+      <section class="view-container">
+        <div id="particles-js"></div>
+        <custom-nav></custom-nav>
+        <div class="container">
+          <div class="col-md-12">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">创建项目</h3>
+              </div>
+              <div class="panel-body">
+                <div class="form-group">
+                  <label for="project-name">请输入项目名</label>
+                  <input
+                    type="text"
+                    class="form-control project-input"
+                    id="project-name"
+                    placeholder="项目名称"
+                    v-model="projectName"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="project-category">请选择项目类型</label>
+                  <select
+                    class="form-control project-input"
+                    id="project-category"
+                    v-model="projectCategoryName"
+                  >
+                  <option value="" >--- 请选择 ---</option>
+                    <option v-for="cate in categoryList" :value="cate">{{ cate }}</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="project-description">请输入项目描述</label>
+                  <textarea
+                    class="form-control project-input"
+                    id="project-description"
+                    rows="5"
+                    v-model="projectDescription"
+                    placeholder="项目描述"
+                  ></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="file">初始化项目</label>
+                  <div>
+                    <button class="btn btn-primary" @click="triggerFileupload">
+                      选择文件
+                    </button>
+                  </div>
+                  <input
+                    class="hidden-file"
+                    type="file"
+                    id="file"
+                    ref="uploadFile"
+                  />
+                  <p class="tip">
+                    支持上传普通文本文件/图片/docx/doc/pdf等类型的资源文件和zip/rar格式的压缩包
+                  </p>
+                </div>
+                <button
+                  class="btn btn-primary"
+                  @click="createProject"
+                  :disabled="isLoading"
+                >
+                  {{ btnText }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <footer class="footer">
+        <div class="container">
+          <div class="row">
+            <div class="col-xs-12 text-center">
+              ©Copyright - CoderChain. All Rights Reserved.
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <script src="../static/js/jquery-2.1.1.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/vue.min.js"></script>
+    <script src="../static/js/particles.min.js"></script>
+    <script src="../static/js/util.js"></script>
+    <script src="../static/js/index.js"></script>
+    <script src="../static/js/api/project.js"></script>
+    <script>
+      function initVM() {
+        new Vue({
+          el: '#vm',
+          data: function() {
+            return {
+              projectName: '',
+              projectDescription: '',
+              projectCategoryName: '',
+              categoryList: [],
+              user: Util.getUserAddr(),
+              btnText: '立刻创建'
+            }
+          },
+          computed: {
+            isLoading() {
+              return this.btnText !== '立刻创建'
+            }
+          },
+          created() {
+            this.fetchCategoryList()
+          },
+          methods: {
+            triggerFileupload() {
+              this.$refs.uploadFile.click()
+            },
+            fetchCategoryList() {
+              projectApi.getCategoryList().then(data => {
+                console.log('获取分类成功：', data)
+                this.categoryList = data
+              }).catch(err => {
+                console.log('出错啦');
+                Util.showErrorPanel(err)
+              })
+            },
+            createProject: function() {
+              // 创建项目
+              var that = this
+
+              // 合法检查
+              this.projectName = Util.trim(this.projectName)
+
+              if (this.projectName == '') {
+                return Util.showErrorPanel('项目名不能为空')
+              }
+
+              if (Util.containsBlank(this.projectName)) {
+                return Util.showErrorPanel('项目名称不能包含空格')
+              }
+
+              if (this.projectName.length > 64) {
+                return Util.showErrorPanel('项目名不能超过64位')
+              }
+
+              if (!Util.isValidFileName(this.projectName)) {
+                return Util.showErrorPanel(
+                  `项目名非法，不能包含 ${Util.ERR_FILENAME_MSG} 等特殊字符`
+                )
+              }
+
+              if (!this.projectCategoryName) {
+                return Util.showErrorPanel('请选择项目分类')
+              }
+
+              // console.log(this.projectName, this.projectDescription, this.projectCategoryName)
+              
+              var formData = new FormData()
+              formData.append('sProjectName', this.projectName)
+              formData.append('sDescription', this.projectDescription)
+              formData.append('sCategoryName', this.projectCategoryName)
+              var $file = document.querySelector('[type=file]').files[0]
+
+              if ($file) {
+                formData.append('upload-file', $file)
+
+                // 获取文件
+                var $file = document.querySelector('[type=file]').files[0]
+                var res = $file.name.split('.')
+                var ext
+
+                if (res.length > 1) {
+                  ext = res[res.length - 1].toLowerCase()
+
+                  if (Util.isUnSupportedType(ext)) {
+                    Util.showErrorPanel(
+                      '暂不支持上传该类型的文件，后续会考虑支持'
+                    )
+                    return
+                  }
+
+                  if (Util.isUnSupportedPackageType(ext)) {
+                    Util.showErrorPanel(
+                      '暂不支持该类型压缩包，后续会考虑支持，目前只支持zip和rar类型压缩包'
+                    )
+                    return
+                  }
+                }
+              }
+              that.btnText = '正在创建中...'
+              projectApi
+                .createProject(formData)
+                .then(function(data) {
+                  // Util.showInfoPanel('创建项目"'+ that.projectName +'"成功')
+                  Util.showInfoPanel(data.retMsg)
+                  that.btnText = '立刻创建'
+                  setTimeout(function() {
+                    window.location =
+                      './project-detail.html?user=' +
+                      that.user +
+                      '&project=' +
+                      that.projectName
+                  }, 1000)
+                })
+                .catch(function(err) {
+                  Util.showErrorPanel(err)
+                  that.btnText = '立刻创建'
+                })
+              console.log(this.projectName)
+            },
+            uploadFile: function() {
+              // 上传文件，获取当前目录
+              var that = this
+              console.log('准备上传文件')
+
+              var $file = document.querySelector('[type=file]').files[0]
+
+              console.log('获取到的文件对象: ', $file)
+              if (!$file) {
+                Util.showErrorPanel('请选择要上传的文件')
+                return
+              }
+
+              var formData = new FormData()
+              formData.append('upload-file', $file)
+
+              if (!that.breadList.length) {
+                //
+                formData.append('sPath', ' ')
+              } else {
+                formData.append('sPath', that.breadList.join('/'))
+              }
+
+              formData.append('sProjectName', project)
+
+              this.showLoading()
+              projectApi
+                .saveFile(formData)
+                .then(function(res) {
+                  console.log('上传文件结果：', res)
+                  Util.showInfoPanel('上传文件成功')
+                  that.fetchProjectDetail()
+                  that.hideAllHelpPanel()
+                })
+                .catch(function(err) {
+                  console.log('上传文件结果：', err)
+                  Util.showErrorPanel(err.retMsg)
+                  that.hideLoading()
+                })
+            }
+          }
+        })
+      }
+
+      window.onload = function() {
+        initVM()
+      }
+    </script>
+  </body>
+</html>
